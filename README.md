@@ -1,7 +1,7 @@
 CPqD ASR Recognizer
 ===================
 
-*O Recognizer é uma API para criação de aplicações de voz que utilizam o servidor CPqD ASR para reconhecimento de fala.*
+O Recognizer é uma API para criação de aplicações de voz que utilizam o servidor CPqD ASR para reconhecimento de fala.
 
 
 Para maiores informações, consulte [a documentação do projeto](https://speech-doc.cpqd.com.br/asr).
@@ -12,10 +12,10 @@ Códigos de exemplo estão sob o diretório `examples` do repositório
 
 ### Dependências
 
-cmake >= 2.8.12
-Biblioteca de desenvolvimento ALSA
-  Debian/Ubuntu e derivados: `apt-get install libasound2-dev`
-  RedHat/CentOS/Fedora e derivados: `yum install alsa-lib-devel`
+* cmake >= 2.8.12
+* Biblioteca de desenvolvimento ALSA
+* * Debian/Ubuntu e derivados: `apt-get install libasound2-dev`
+* * RedHat/CentOS/Fedora e derivados: `yum install alsa-lib-devel`
 
 ### Compilando a partir do código-fonte
 
