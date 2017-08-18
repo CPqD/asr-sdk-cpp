@@ -1,0 +1,105 @@
+include(cmake/utils.cmake)
+
+if(MSVC)
+  string(REGEX REPLACE "^  *| * $" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+  string(REGEX REPLACE "^  *| * $" "" CMAKE_CXX_FLAGS_INIT "${CMAKE_CXX_FLAGS_INIT}")
+  if(CMAKE_CXX_FLAGS STREQUAL CMAKE_CXX_FLAGS_INIT)
+    # override cmake default exception handling option
+    string(REPLACE "/EHsc" "/EHa" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}"  CACHE STRING "Flags used by the compiler during all build types." FORCE)
+  endif()
+endif()
+
+set(CPQD_EXTRA_FLAGS "")
+set(CPQD_EXTRA_C_FLAGS "")
+set(CPQD_EXTRA_CXX_FLAGS "")
+set(CPQD_EXTRA_FLAGS_RELEASE "")
+set(CPQD_EXTRA_FLAGS_DEBUG "")
+set(CPQD_EXTRA_EXE_LINKER_FLAGS "")
+set(CPQD_EXTRA_EXE_LINKER_FLAGS_RELEASE "")
+set(CPQD_EXTRA_EXE_LINKER_FLAGS_DEBUG "")
+
+if (CMAKE_CXX_COMPILER MATCHES ".*clang")
+  set(CMAKE_COMPILER_IS_CLANGXX 1)
+endif ()
+
+macro(add_extra_compiler_option option)
+  if(CMAKE_BUILD_TYPE)
+    set(CMAKE_TRY_COMPILE_CONFIGURATION ${CMAKE_BUILD_TYPE})
+  endif()
+  cpqd_check_flag_support(CXX "${option}" _varname "${CPQD_EXTRA_CXX_FLAGS} ${ARGN}")
+  if(${_varname})
+    set(CPQD_EXTRA_CXX_FLAGS "${CPQD_EXTRA_CXX_FLAGS} ${option}")
+  endif()
+
+  cpqd_check_flag_support(C "${option}" _varname "${CPQD_EXTRA_C_FLAGS} ${ARGN}")
+  if(${_varname})
+    set(CPQD_EXTRA_C_FLAGS "${CPQD_EXTRA_C_FLAGS} ${option}")
+  endif()
+endmacro()
+
+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGXX)
+  add_extra_compiler_option(-W)
+  add_extra_compiler_option(-Wall)
+  add_extra_compiler_option(-fpermissive)
+  add_extra_compiler_option(-std=c++11)
+  set(CPQD_EXTRA_FLAGS_RELEASE "${CPQD_EXTRA_FLAGS_RELEASE} -DNDEBUG")
+  set(CPQD_EXTRA_FLAGS_DEBUG "${CPQD_EXTRA_FLAGS_DEBUG} -O0 -D_DEBUG")
+  if(BUILD_WITH_DEBUG_INFO)
+    set(CPQD_EXTRA_FLAGS_DEBUG "${CPQD_EXTRA_FLAGS_DEBUG} -ggdb3")
+  endif()
+
+   # Profiling?
+  if(ENABLE_PROFILING)
+    add_extra_compiler_option("-pg -g")
+    # turn off incompatible options
+    foreach(flags CMAKE_CXX_FLAGS CMAKE_C_FLAGS CMAKE_CXX_FLAGS_RELEASE CMAKE_C_FLAGS_RELEASE CMAKE_CXX_FLAGS_DEBUG CMAKE_C_FLAGS_DEBUG
+                  CPQD_EXTRA_FLAGS_RELEASE CPQD_EXTRA_FLAGS_DEBUG CPQD_EXTRA_C_FLAGS CPQD_EXTRA_CXX_FLAGS)
+      #string(REPLACE "-fomit-frame-pointer" "" ${flags} "${${flags}}")
+      #string(REPLACE "-ffunction-sections" "" ${flags} "${${flags}}")
+    endforeach()
+  elseif(NOT APPLE AND NOT ANDROID)
+    # Remove unreferenced functions: function level linking
+    # add_extra_compiler_option(-ffunction-sections)
+  endif()
+endif()
+
+if(MSVC)
+  set(CPQD_EXTRA_FLAGS "${CPQD_EXTRA_FLAGS} /D _CRT_SECURE_NO_DEPRECATE /D _CRT_NONSTDC_NO_DEPRECATE /D _SCL_SECURE_NO_WARNINGS")
+  if(BUILD_WITH_DEBUG_INFO)
+    set(CPQD_EXTRA_EXE_LINKER_FLAGS_RELEASE "${CPQD_EXTRA_EXE_LINKER_FLAGS_RELEASE} /debug")
+    set(CPQD_EXTRA_FLAGS_RELEASE "${CPQD_EXTRA_FLAGS_RELEASE} /Zi")
+  endif()
+endif()
+
+# Add user supplied extra options (optimization, etc...)
+# ==========================================================
+set(CPQD_EXTRA_FLAGS         "${CPQD_EXTRA_FLAGS}"         CACHE INTERNAL "Extra compiler options")
+set(CPQD_EXTRA_C_FLAGS       "${CPQD_EXTRA_C_FLAGS}"       CACHE INTERNAL "Extra compiler options for C sources")
+set(CPQD_EXTRA_CXX_FLAGS     "${CPQD_EXTRA_CXX_FLAGS}"     CACHE INTERNAL "Extra compiler options for C++ sources")
+set(CPQD_EXTRA_FLAGS_RELEASE "${CPQD_EXTRA_FLAGS_RELEASE}" CACHE INTERNAL "Extra compiler options for Release build")
+set(CPQD_EXTRA_FLAGS_DEBUG   "${CPQD_EXTRA_FLAGS_DEBUG}"   CACHE INTERNAL "Extra compiler options for Debug build")
+set(CPQD_EXTRA_EXE_LINKER_FLAGS         "${CPQD_EXTRA_EXE_LINKER_FLAGS}"         CACHE INTERNAL "Extra linker flags")
+set(CPQD_EXTRA_EXE_LINKER_FLAGS_RELEASE "${CPQD_EXTRA_EXE_LINKER_FLAGS_RELEASE}" CACHE INTERNAL "Extra linker flags for Release build")
+set(CPQD_EXTRA_EXE_LINKER_FLAGS_DEBUG   "${CPQD_EXTRA_EXE_LINKER_FLAGS_DEBUG}"   CACHE INTERNAL "Extra linker flags for Debug build")
+
+#combine all "extra" options
+set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS} ${CPQD_EXTRA_FLAGS} ${CPQD_EXTRA_C_FLAGS}")
+set(CMAKE_CXX_FLAGS         "${CMAKE_CXX_FLAGS} ${CPQD_EXTRA_FLAGS} ${CPQD_EXTRA_CXX_FLAGS}")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${CPQD_EXTRA_FLAGS_RELEASE}")
+set(CMAKE_C_FLAGS_RELEASE   "${CMAKE_C_FLAGS_RELEASE} ${CPQD_EXTRA_FLAGS_RELEASE}")
+set(CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG} ${CPQD_EXTRA_FLAGS_DEBUG}")
+set(CMAKE_C_FLAGS_DEBUG     "${CMAKE_C_FLAGS_DEBUG} ${CPQD_EXTRA_FLAGS_DEBUG}")
+set(CMAKE_EXE_LINKER_FLAGS         "${CMAKE_EXE_LINKER_FLAGS} ${CPQD_EXTRA_EXE_LINKER_FLAGS}")
+set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} ${CPQD_EXTRA_EXE_LINKER_FLAGS_RELEASE}")
+set(CMAKE_EXE_LINKER_FLAGS_DEBUG   "${CMAKE_EXE_LINKER_FLAGS_DEBUG} ${CPQD_EXTRA_EXE_LINKER_FLAGS_DEBUG}")
+
+if(MSVC)
+  # allow extern "C" functions throw exceptions
+  foreach(flags CMAKE_C_FLAGS CMAKE_C_FLAGS_RELEASE CMAKE_C_FLAGS_RELEASE CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_RELEASE CMAKE_CXX_FLAGS_DEBUG)
+    string(REPLACE "/EHsc-" "/EHs" ${flags} "${${flags}}")
+    string(REPLACE "/EHsc"  "/EHs" ${flags} "${${flags}}")
+
+    string(REPLACE "/Zm1000" "" ${flags} "${${flags}}")
+  endforeach()
+endif()

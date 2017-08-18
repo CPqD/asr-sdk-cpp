@@ -1,0 +1,19 @@
+#include <string>
+
+namespace test {
+
+const std::string server_url = "ws://localhost:8025/asr-server/asr";
+const std::string username = "";
+const std::string password = "";
+
+const std::string grammar_phone_uri = "builtin:grammar/samples/phone";
+const std::string slm_uri           = "builtin:slm/general-small";
+
+const std::string audio_phone_8k = "${CMAKE_CURRENT_SOURCE_DIR}/res/audio/phone-1937050211-8k.wav";
+const std::string audio_phone_8k_raw = "${CMAKE_CURRENT_SOURCE_DIR}/res/audio/phone-1937050211-8k.raw";
+const std::string audio_silence_8k = "${CMAKE_CURRENT_SOURCE_DIR}/res/audio/silence-8k.wav";
+const std::string previsao_tempo_8k = "${CMAKE_CURRENT_SOURCE_DIR}/res/audio/previsao-tempo-8k.wav";
+const std::string previsao_tempo_8k_raw = "${CMAKE_CURRENT_SOURCE_DIR}/res/audio/previsao-tempo-8k.raw";
+const std::string long_8k = "${CMAKE_CURRENT_SOURCE_DIR}/res/audio/long_8k.wav";
+
+}  // namespace test
