@@ -27,7 +27,7 @@
 int main(int argc, char* argv[]) {
   if(argc != 4 && argc != 6){
     std::cerr << "Usage: " << argv[0] << " <ws_url> <lang_uri> <wav_path> [ <user> <password> ]" << std::endl;
-    std::cerr << "   eg: " << argv[0] << " ws://127.0.0.1:8025/asr-server/asr builtin:grammar/samples/phone /path/to/audio.wav" << std::endl;
+    std::cerr << "   eg: " << argv[0] << " ws://127.0.0.1:8025/asr-server/asr builtin:grammar/samples/phone audio/phone-1937050211-8k.wav" << std::endl;
     std::cerr << "  eg2: " << argv[0] << " wss://contact/cpqd/and/request/a/key/ builtin:slm/general /path/to/audio.wav myusername mypassword" << std::endl;
     return -1;
   }
@@ -61,38 +61,30 @@ int main(int argc, char* argv[]) {
       .connectOnRecognize(false)
       .autoClose(false)
       .build();
-  while(1) {
 
-    audio = std::make_shared<FileAudioSource>(audio_file);
-    lm = LanguageModelList::Builder().addFromURI(argv[2]).build();
+  audio = std::make_shared<FileAudioSource>(audio_file);
+  lm = LanguageModelList::Builder().addFromURI(argv[2]).build();
 
-    std::cout << "Press R to recognize, or anything else to exit" << std::endl;
-    std::cin >> input;
-    if(!((input=='r' || input == 'R'))){
-      break;
+  asr->recognize(audio, std::move(lm));
+  std::cout << "Recognition wait" << std::endl;
+  std::vector<RecognitionResult> result = asr->waitRecognitionResult();
+  std::cout << "Recognition end" << std::endl;
+
+  for (RecognitionResult& res : result) {
+    if (res.getCode() == RecognitionResult::Code::NO_MATCH) {
+      std::cout << "NO_MATCH" << std::endl;
+      continue;
     }
 
-    asr->recognize(audio, std::move(lm));
-    std::cout << "Recognition wait" << std::endl;
-    std::vector<RecognitionResult> result = asr->waitRecognitionResult();
-    std::cout << "Recognition end" << std::endl;
-
-    for (RecognitionResult& res : result) {
-      if (res.getCode() == RecognitionResult::Code::NO_MATCH) {
-        std::cout << "NO_MATCH" << std::endl;
-        continue;
-      }
-
-      int i = 0;
-      for (RecognitionResult::Alternative& alt : res.getAlternatives()) {
-        std::cout << "Alternativa [" << ++i
-                  << "] (score = " << alt.getConfidence()
-                  << "): " << alt.getText() << std::endl;
-        int j = 0;
-        for (Interpretation& interpretation : alt.getInterpretations()) {
-          std::cout << "\t Interpretacao [" << ++j
-                    << "]: " << interpretation.text_ << std::endl;
-        }
+    int i = 0;
+    for (RecognitionResult::Alternative& alt : res.getAlternatives()) {
+      std::cout << "Alternativa [" << ++i
+                << "] (score = " << alt.getConfidence()
+                << "): " << alt.getText() << std::endl;
+      int j = 0;
+      for (Interpretation& interpretation : alt.getInterpretations()) {
+        std::cout << "\t Interpretacao [" << ++j
+                  << "]: " << interpretation.text_ << std::endl;
       }
     }
   }
