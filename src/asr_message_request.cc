@@ -16,4 +16,4 @@
 
 #include "src/asr_message_request.h"
 
-ASRMessageRequest::ASRMessageRequest(Method c) { start_line_ = startLine(c); }
+ASRMessageRequest::ASRMessageRequest(Method c) { start_line_ = firstLine(c); }

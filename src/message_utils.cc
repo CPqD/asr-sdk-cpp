@@ -17,7 +17,10 @@
 #include "src/message_utils.h"
 #include "src/constants.h"
 
-std::string getString(Method c) {
+#include <sstream>
+#include <iterator>
+
+std::string getMethodString(Method c) {
   switch (c) {
   case Method::CreateSession:     return "CREATE_SESSION";
   case Method::SetParameters:     return "SET_PARAMETERS";
@@ -34,6 +37,23 @@ std::string getString(Method c) {
   }
 }
 
-std::string startLine(Method c) {
-  return asr_version + msg_separator + getString(c);
+std::string firstLine(Method c) {
+  return asr_version + msg_separator + getMethodString(c);
+}
+
+// Pure std split helper function
+// https://stackoverflow.com/a/236803
+template<typename Out>
+void split(const std::string &s, char delim, Out result) {
+    std::stringstream ss;
+    ss.str(s);
+    std::string item;
+    while (std::getline(ss, item, delim)) {
+        *(result++) = item;
+    }
+}
+std::vector<std::string> split(const std::string &s, char delim) {
+    std::vector<std::string> elems;
+    split(s, delim, std::back_inserter(elems));
+    return elems;
 }

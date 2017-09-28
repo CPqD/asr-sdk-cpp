@@ -21,11 +21,12 @@
 #include <cpqd/asr-client/recognition_result.h>
 
 #include <string>
-#include <vector>
 
 #include "src/asr_message_request.h"
 #include "src/message_utils.h"
 #include "src/send_message.h"
+
+
 
 void ASRProcessMsg::setNext(std::shared_ptr<ASRProcessMsg> &next) {
   next_ = next;
@@ -46,7 +47,10 @@ void ASRProcessMsg::add(std::shared_ptr<ASRProcessMsg> &next) {
 
 bool ASRProcessResponse::handle(SpeechRecognizer::Impl &impl,
                                 ASRMessageResponse &response) {
-  if (response.get_start_line() != startLine(Method::Response)) {
+  // TODO: Treat the version string
+  std::string method_response = split(response.get_start_line(), ' ')[2];
+
+  if (method_response != getMethodString(Method::Response)) {
     return ASRProcessMsg::handle(impl, response);
   }
 
@@ -67,13 +71,13 @@ bool ASRProcessResponse::handle(SpeechRecognizer::Impl &impl,
   std::string method = getString(ResponseHeader::Method);
   value = response.get_header(method);
 
-  if (value == ::getString(Method::CreateSession)) {
+  if (value == getMethodString(Method::CreateSession)) {
     return createSession(impl, response);
-  } else if (value == ::getString(Method::SetParameters)) {
+  } else if (value == getMethodString(Method::SetParameters)) {
     return setParameters(impl, response);
-  } else if (value == ::getString(Method::StartRecognition)) {
+  } else if (value == getMethodString(Method::StartRecognition)) {
     return startRecog(impl, response);
-  } else if (value == ::getString(Method::CancelRecognition)) {
+  } else if (value == getMethodString(Method::CancelRecognition)) {
     return cancelRecog(impl, response);
   }
 
@@ -260,7 +264,8 @@ std::string ASRProcessResponse::getString(ResultStatus value) {
 
 bool ASRProcessStartSpeech::handle(SpeechRecognizer::Impl &impl,
                                    ASRMessageResponse &response) {
-  if (response.get_start_line() != startLine(Method::StartOfSpeech)) {
+  std::string method = split(response.get_start_line(), ' ')[2];
+  if (method != getMethodString(Method::StartOfSpeech)) {
     return ASRProcessMsg::handle(impl, response);
   }
 
@@ -274,7 +279,8 @@ bool ASRProcessStartSpeech::handle(SpeechRecognizer::Impl &impl,
 
 bool ASRProcessEndSpeech::handle(SpeechRecognizer::Impl &impl,
                                  ASRMessageResponse &response) {
-  if (response.get_start_line() != startLine(Method::EndOfSpeech)) {
+  std::string method = split(response.get_start_line(), ' ')[2];
+  if (method != getMethodString(Method::EndOfSpeech)) {
     return ASRProcessMsg::handle(impl, response);
   }
 

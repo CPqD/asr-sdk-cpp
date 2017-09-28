@@ -24,7 +24,8 @@
 
 bool ASRProcessResult::handle(SpeechRecognizer::Impl &impl,
                 ASRMessageResponse &response) {
-  if (response.get_start_line() != startLine(Method::RecognitionResult)) {
+  std::string method = split(response.get_start_line(), ' ')[2];
+  if (method != getMethodString(Method::RecognitionResult)) {
     return ASRProcessMsg::handle(impl, response);
   }
 

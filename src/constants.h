@@ -20,7 +20,7 @@
 #include <string>
 
 /// ASR message protocol version
-static const std::string asr_version = "ASR 2.1";
+static const std::string asr_version = "ASR 2.2";
 
 /// Literal value of the ASR message delimiter
 static const std::string msg_delimiter = "\r\n";

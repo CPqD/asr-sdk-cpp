@@ -18,6 +18,7 @@
 #define SRC_MESSAGE_UTILS_H_
 
 #include <string>
+#include <vector>
 
 enum class Method {
   CreateSession,
@@ -34,8 +35,11 @@ enum class Method {
   RecognitionResult,
 };
 
-std::string getString(Method c);
+std::string getMethodString(Method c);
 
-std::string startLine(Method c);
+std::string firstLine(Method c);
+
+std::vector<std::string> split(const std::string &s, char delim);
+
 
 #endif  // SRC_MESSAGE_UTILS_H_
