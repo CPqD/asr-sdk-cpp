@@ -14,7 +14,8 @@ ExternalProject_Add(portaudio_ext
           "-DCMAKE_BUILD_TYPE=\"${CMAKE_BUILD_TYPE}\" "
           "-DCMAKE_C_FLAGS=\"-fPIC\" "
           "-DCMAKE_CXX_FLAGS=\"-fPIC\" "
-          "-DPA_USE_ALSA=1 ")
+          "-DPA_USE_ALSA=1 "
+          "-DPA_USE_JACK=0 ")
 
 add_library(portaudio STATIC IMPORTED)
 if (MSVC)
