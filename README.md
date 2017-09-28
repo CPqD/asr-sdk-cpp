@@ -43,6 +43,11 @@ Supomos que esteja usando modelos para áudio de 8kHz, caso contrário, deve tes
 
     ./basic ws://127.0.0.1:8025/asr-server/asr builtin:grammar/samples/phone ../../audio/phone-1937050211-16k.wav
 
+### Usando a biblioteca em aplicações
+
+A biblioteca cliente pode ser usada em sua aplicação através do arquivo
+`libasr-client.so` criado em `build/src` e dos arquivos de *header* presentes em
+`include/cpqd/asr-client`.
 
 Licença
 -------
