@@ -18,6 +18,8 @@
 
 #include <string>
 
+#include <cpqd/asr-client/recognition_exception.h>
+
 #include "src/asr_message_request.h"
 #include "src/message_utils.h"
 
@@ -110,7 +112,21 @@ void ASRSendMessage::setParameters(SpeechRecognizer::Impl &impl) {
 }
 
 void ASRSendMessage::startRecognition(SpeechRecognizer::Impl &impl) {
-  std::string extra = impl.lm_->getUri();
+  std::string lm_uri, grammar_body, extra;
+
+  lm_uri = impl.lm_->getUri();
+  grammar_body = impl.lm_->getGrammarBody();
+
+  // if lm property uri and grammar body was not set, throw an error
+  if (!lm_uri.empty()) {
+    extra = lm_uri;
+  } else if (!grammar_body.empty()) {
+    extra = grammar_body;
+  } else {
+    throw RecognitionException(RecognitionError::Code::FAILURE,
+        std::string("lm uri and grammar body is emprty"));
+  }
+
   ASRMessageRequest request(Method::StartRecognition);
   request.set_header("Accept", "application/json");
   request.set_header("Content-Type", "text/uri-list");
