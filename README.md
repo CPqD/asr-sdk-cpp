@@ -33,7 +33,7 @@ Depois de compilar, a partir do diretório `build/examples` criado, execute um t
 
     export LD_LIBRARY_PATH=$PWD/src
 
-    ./basic ws://127.0.0.1:8025/asr-server/asr builtin:grammar/samples/phone ../../audio/phone-1937050211-8k.wav
+    ./basic ws://127.0.0.1:8025/asr-server/asr builtin:grammar/samples/phone ../../examples/audio/phone-1937050211-8k.wav
 
 **Você deve mudar o IP do servidor ASR de 127.0.0.1 para o IP correto da sua instalação.**
 
@@ -41,7 +41,7 @@ Supomos que esteja usando modelos para áudio de 8kHz, caso contrário, deve tes
 
     export LD_LIBRARY_PATH=$PWD/src
 
-    ./basic ws://127.0.0.1:8025/asr-server/asr builtin:grammar/samples/phone ../../audio/phone-1937050211-16k.wav
+    ./basic ws://127.0.0.1:8025/asr-server/asr builtin:grammar/samples/phone ../../examples/audio/phone-1937050211-16k.wav
 
 ### Usando a biblioteca em aplicações
 
