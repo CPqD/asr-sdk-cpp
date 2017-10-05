@@ -113,23 +113,30 @@ void ASRSendMessage::setParameters(SpeechRecognizer::Impl &impl) {
 
 void ASRSendMessage::startRecognition(SpeechRecognizer::Impl &impl) {
   std::string lm_uri, grammar_body, extra;
+  std::string content_type;
 
   lm_uri = impl.lm_->getUri();
   grammar_body = impl.lm_->getGrammarBody();
 
+  ASRMessageRequest request(Method::StartRecognition);
+  request.set_header("Accept", "application/json");
+
   // if lm property uri and grammar body was not set, throw an error
   if (!lm_uri.empty()) {
     extra = lm_uri;
+    content_type = "text/uri-list";
   } else if (!grammar_body.empty()) {
     extra = grammar_body;
+    content_type = "application/srgs";
+
+    // only one grammar is allowed, so the id is fixed by now
+    request.set_header("Content-ID", "gram");
   } else {
     throw RecognitionException(RecognitionError::Code::FAILURE,
         std::string("lm uri and grammar body is emprty"));
   }
 
-  ASRMessageRequest request(Method::StartRecognition);
-  request.set_header("Accept", "application/json");
-  request.set_header("Content-Type", "text/uri-list");
+  request.set_header("Content-Type", content_type);
   request.set_extra(extra);
   request.set_header("Content-Length", std::to_string(extra.size()));
 
