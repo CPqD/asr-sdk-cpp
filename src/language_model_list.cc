@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include <cpqd/asr-client/language_model_list.h>
+#include <cpqd/asr-client/recognition_exception.h>
 
 std::unique_ptr<LanguageModelList> LanguageModelList::Builder::build() {
   return std::unique_ptr<LanguageModelList>(new LanguageModelList(properties_));
@@ -22,8 +23,30 @@ std::unique_ptr<LanguageModelList> LanguageModelList::Builder::build() {
 
 LanguageModelList::Builder& LanguageModelList::Builder::addFromURI(
     const std::string& uri) {
+  // at the moment support only one uri or inline grammar
+  if (!properties_.uri_.empty() || !properties_.grammar_body_.empty()) {
+    throw RecognitionException(RecognitionError::Code::FAILURE,
+        std::string("Only one lm is supported at the moment"));
+  }
+
   properties_.uri_ = uri;
   return *this;
 }
 
+LanguageModelList::Builder& LanguageModelList::Builder::addInlineGrammar(
+    const std::string& grammar_body) {
+  // at the moment support only one uri or inline grammar
+  if (!properties_.uri_.empty() || !properties_.grammar_body_.empty()) {
+    throw RecognitionException(RecognitionError::Code::FAILURE,
+        std::string("Only one lm is supported at the moment"));
+  }
+
+  properties_.grammar_body_ = grammar_body;
+  return *this;
+}
+
 std::string LanguageModelList::getUri() { return properties_.uri_; }
+
+std::string LanguageModelList::getGrammarBody() {
+  return properties_.grammar_body_;
+}

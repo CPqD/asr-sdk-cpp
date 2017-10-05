@@ -31,6 +31,9 @@ class LanguageModelList {
 
     std::string uri_;
 
+    // inline grammar body
+    std::string grammar_body_;
+
     friend class LanguageModelList;
     friend class LanguageModelList::Builder;
   };
@@ -39,6 +42,8 @@ class LanguageModelList {
   LanguageModelList() = delete;
 
   std::string getUri();
+
+  std::string getGrammarBody();
 
  private:
   explicit LanguageModelList(const Properties& properties)
@@ -57,6 +62,10 @@ class LanguageModelList::Builder {
   // from its URI. URIs are allowed with protocols: "http", "file", "builtin".
   // At the moment, we only support "file" e "builtin".
   Builder& addFromURI(const std::string& uri);
+
+  // Add a grammar from its body, inferring the type of grammar by its content
+  // Allowed types are SRGS ABNF or XML
+  Builder& addInlineGrammar(const std::string& addInlineGrammar);
 
  private:
   LanguageModelList::Properties properties_;
