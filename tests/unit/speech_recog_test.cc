@@ -507,3 +507,103 @@ TEST(RecognizerTest, sessionTimeout) {
     ASSERT_EQ(RecognitionResult::Code::RECOGNIZED, res.getCode());
   }
 }
+
+TEST(GrammarInline, Recog) {
+  std::shared_ptr<AudioSource> audio =
+      std::make_shared<FileAudioSource>(test::audio_yes_16k);
+
+  std::string str_gram =  "#ABNF 1.0 UTF-8;\n"
+                          "language pt-BR;\n"
+                          "tag-format <semantics/1.0>;\n"
+                          "mode voice;\n"
+                          "root $root;\n"
+                          "$root = sim | não;\n";
+
+  std::unique_ptr<LanguageModelList> lm =
+      LanguageModelList::Builder()
+      .addInlineGrammar(str_gram)
+      .build();
+
+  std::unique_ptr<SpeechRecognizer> asr = defaultBuild();
+  asr->recognize(audio, std::move(lm));
+  std::vector<RecognitionResult> result = asr->waitRecognitionResult();
+  asr->close();
+
+  ASSERT_GT(result.size(), 0);
+}
+
+TEST(GrammarInline, WrongGrammar) {
+  std::shared_ptr<AudioSource> audio =
+      std::make_shared<FileAudioSource>(test::audio_yes_16k);
+
+  std::string str_gram =  "#ABNF 1.0 UTF-8;\n"
+                          "language pt-BR;\n"
+                          "tag-format <semantics/1.0>;\n"
+                          "mode voice;\n"
+                          "root $rodfot;\n"
+                          "$root = sim | não;\n";
+
+  std::unique_ptr<LanguageModelList> lm =
+      LanguageModelList::Builder()
+      .addInlineGrammar(str_gram)
+      .build();
+
+  try {
+    std::unique_ptr<SpeechRecognizer> asr = defaultBuild();
+    asr->recognize(audio, std::move(lm));
+
+    std::vector<RecognitionResult> result = asr->waitRecognitionResult();
+    asr->close();
+  } catch (RecognitionException& e) {
+  } catch (...) {
+    FAIL() << "Expected error on start recognition";
+  }
+}
+
+TEST(GrammarInline, TwoGrammars) {
+  std::shared_ptr<AudioSource> audio =
+      std::make_shared<FileAudioSource>(test::audio_yes_16k);
+  std::unique_ptr<LanguageModelList> lm;
+
+  try {
+  std::string str_gram =  "#ABNF 1.0 UTF-8;\n"
+                          "language pt-BR;\n"
+                          "tag-format <semantics/1.0>;\n"
+                          "mode voice;\n"
+                          "root $root;\n"
+                          "$root = sim | não;\n";
+
+   lm = LanguageModelList::Builder()
+        .addInlineGrammar(str_gram)
+        .addInlineGrammar(str_gram)
+        .build();
+  } catch (RecognitionException& e) {
+    return;
+  } catch (...) {
+    FAIL() << "Expected error on LanguageModelList";
+  }
+}
+
+TEST(GrammarInline, InlineAndUri) {
+  std::shared_ptr<AudioSource> audio =
+      std::make_shared<FileAudioSource>(test::audio_yes_16k);
+  std::unique_ptr<LanguageModelList> lm;
+
+  try {
+  std::string str_gram =  "#ABNF 1.0 UTF-8;\n"
+                          "language pt-BR;\n"
+                          "tag-format <semantics/1.0>;\n"
+                          "mode voice;\n"
+                          "root $root;\n"
+                          "$root = sim | não;\n";
+
+   lm = LanguageModelList::Builder()
+        .addInlineGrammar(str_gram)
+        .addFromURI(test::grammar_phone_uri)
+        .build();
+  } catch (RecognitionException& e) {
+    return;
+  } catch (...) {
+    FAIL() << "Expected error on LanguageModelList";
+  }
+}
