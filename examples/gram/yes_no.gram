@@ -1,0 +1,7 @@
+#ABNF 1.0 UTF-8;
+language pt-BR;
+tag-format <semantics/1.0>;
+mode voice;
+
+root $root;
+$root = sim | não;

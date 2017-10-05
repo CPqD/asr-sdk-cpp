@@ -6,3 +6,6 @@ target_link_libraries(mic asr-client)
 
 build_executable(basic basic.cc)
 target_link_libraries(basic asr-client)
+
+build_executable(dgram dgram.cc)
+target_link_libraries(dgram asr-client)
