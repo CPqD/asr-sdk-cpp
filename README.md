@@ -1,9 +1,9 @@
 CPqD ASR Recognizer
 ===================
 
-O Recognizer é uma API para criação de aplicações de voz que utilizam o servidor CPqD ASR para reconhecimento de fala.
+O Recognizer é uma API para criação de aplicações de voz que utilizam o servidor CPqD Reconhecimento de Fala (CPqD ASR).
 
-Para maiores informações sobre o CPqD ASR, consulte [o site](http://speechweb.cpqd.com.br/asr/docs/latest/).
+Para maiores informações sobre o CPqD ASR, consulte o [site do produto](http://speechweb.cpqd.com.br/asr/docs/latest/).
 
 Para entender como usar esta biblioteca, sugerimos verificar e executar os exemplos, em particular [basic.cc](https://github.com/CPqD/asr-sdk-cpp/blob/master/examples/basic.cc).
 
