@@ -35,7 +35,7 @@ Depois de compilar, a partir do diretório `build/examples` criado, execute um t
 
     ./basic ws://127.0.0.1:8025/asr-server/asr builtin:grammar/samples/phone ../../examples/audio/phone-1937050211-8k.wav
 
-**Você deve mudar o IP do servidor ASR de 127.0.0.1 para o IP correto da sua instalação.**
+**Você deve mudar o IP do servidor ASR de 127.0.0.1 para o IP correto do servidor ASR na sua instalação.**
 
 Supomos que esteja usando modelos para áudio de 8kHz, caso contrário, deve testar com o arquivo de áudio de 16kHz:
 
