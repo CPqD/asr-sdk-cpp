@@ -95,14 +95,17 @@ TEST(RecognizerTest, basicGrammar) {
   asr->close();
 
   ASSERT_LT(0, result.size());
+  bool at_least_one_high_confidence = false;
   for (RecognitionResult& res : result) {
-    ASSERT_EQ(RecognitionResult::Code::RECOGNIZED, res.getCode());
+    if(res.getCode() != RecognitionResult::Code::RECOGNIZED) continue;
+    at_least_one_high_confidence = true;
 
     for (RecognitionResult::Alternative& alt : res.getAlternatives()) {
       std::cout << "alt.getConfidence(): " << alt.getConfidence() << std::endl;
       ASSERT_GE(alt.getConfidence(), 90);
     }
   }
+  ASSERT_EQ(true, at_least_one_high_confidence) << "No results with high confidence!";
 }
 
 TEST(NoGrammarTest, basicGrammarClearVoice) {
@@ -116,15 +119,18 @@ TEST(NoGrammarTest, basicGrammarClearVoice) {
   std::vector<RecognitionResult> result = asr->waitRecognitionResult();
   asr->close();
 
-  ASSERT_GT(result.size(), 0);
-
+  ASSERT_LT(0, result.size());
+  bool at_least_one_high_confidence = false;
   for (RecognitionResult& res : result) {
-    ASSERT_EQ(RecognitionResult::Code::RECOGNIZED, res.getCode());
+    if(res.getCode() != RecognitionResult::Code::RECOGNIZED) continue;
+    at_least_one_high_confidence = true;
 
     for (RecognitionResult::Alternative& alt : res.getAlternatives()) {
+      std::cout << "alt.getConfidence(): " << alt.getConfidence() << std::endl;
       ASSERT_GE(alt.getConfidence(), 90);
     }
   }
+  ASSERT_EQ(true, at_least_one_high_confidence) << "No results with high confidence!";
 }
 
 TEST(NoGrammarTest, recognizeNoSpeech) {
@@ -136,7 +142,7 @@ TEST(NoGrammarTest, recognizeNoSpeech) {
   asr->recognize(audio, std::move(lm));
 
   std::vector<RecognitionResult> result = asr->waitRecognitionResult();
-  EXPECT_EQ(result[0].getCode(), RecognitionResult::Code::NO_SPEECH);
+  EXPECT_EQ(RecognitionResult::Code::NO_SPEECH, result[0].getCode());
   asr->close();
 }
 
@@ -164,7 +170,7 @@ TEST(RecognizerTest, recognizeNoInput) {
       .build();
   asr->recognize(audio, std::move(lm));
   std::vector<RecognitionResult> res = asr->waitRecognitionResult();
-  EXPECT_EQ(res[0].getCode(), RecognitionResult::Code::NO_INPUT_TIMEOUT);
+  EXPECT_EQ(RecognitionResult::Code::NO_INPUT_TIMEOUT, res[0].getCode());
   asr->close();
 }
 
@@ -410,9 +416,12 @@ TEST(RecognizerTest, multipleRecognize) {
     asr->recognize(audio, std::move(lm));
     std::vector<RecognitionResult> result = asr->waitRecognitionResult();
 
+    bool at_least_one_recognized = false;
     for (RecognitionResult& res : result) {
-      ASSERT_EQ(RecognitionResult::Code::RECOGNIZED, res.getCode());
+      if(res.getCode() == RecognitionResult::Code::RECOGNIZED)
+        at_least_one_recognized = true;
     }
+    ASSERT_EQ(true, at_least_one_recognized);
   }
 }
 
@@ -428,7 +437,7 @@ TEST(RecognizerTest, multipleConnectOnRecognize) {
       .connectOnRecognize(true)
       .build();
   ASSERT_EQ(false, asr->isOpen()) <<
-                                     "Connection should stay closed until 1st recognition!";
+  "Connection should stay closed until 1st recognition!";
 
   int wait_secs[] = {2, 2, 6};
   for (auto i = 0; i < 3; ++i) {
@@ -442,10 +451,14 @@ TEST(RecognizerTest, multipleConnectOnRecognize) {
     std::vector<RecognitionResult> result = asr->waitRecognitionResult();
 
     ASSERT_EQ(true, asr->isOpen()) <<
-                                      "Connection should stay open after 1st recognition!";;
+    "Connection should stay open after 1st recognition!";
+
+    bool at_least_one_recognized = false;
     for (RecognitionResult& res : result) {
-      ASSERT_EQ(RecognitionResult::Code::RECOGNIZED, res.getCode());
+      if(res.getCode() == RecognitionResult::Code::RECOGNIZED)
+        at_least_one_recognized = true;
     }
+    ASSERT_EQ(true, at_least_one_recognized);
 
     std::this_thread::sleep_for(std::chrono::seconds(wait_secs[i]));
   }
@@ -465,7 +478,7 @@ TEST(RecognizerTest, multipleAutoClose) {
       .autoClose(true)
       .build();
   ASSERT_EQ(false, asr->isOpen()) <<
-                                     "Connection should stay closed until recognition!";
+  "Connection should stay closed until recognition!";
 
   int wait_secs[] = {2, 2, 6};
   for (auto i = 0; i < 3; ++i) {
@@ -479,10 +492,14 @@ TEST(RecognizerTest, multipleAutoClose) {
     std::vector<RecognitionResult> result = asr->waitRecognitionResult();
 
     ASSERT_EQ(false, asr->isOpen()) <<
-                                       "Connection should close after every recognition!";;
+    "Connection should close after every recognition!";;
+
+    bool at_least_one_recognized = false;
     for (RecognitionResult& res : result) {
-      ASSERT_EQ(RecognitionResult::Code::RECOGNIZED, res.getCode());
+      if(res.getCode() == RecognitionResult::Code::RECOGNIZED)
+        at_least_one_recognized = true;
     }
+    ASSERT_EQ(true, at_least_one_recognized);
 
     std::this_thread::sleep_for(std::chrono::seconds(wait_secs[i]));
   }
@@ -503,9 +520,12 @@ TEST(RecognizerTest, sessionTimeout) {
   asr->close();
 
   ASSERT_LT(0, result.size());
+  bool at_least_one_recognized = false;
   for (RecognitionResult& res : result) {
-    ASSERT_EQ(RecognitionResult::Code::RECOGNIZED, res.getCode());
+    if(res.getCode() == RecognitionResult::Code::RECOGNIZED)
+      at_least_one_recognized = true;
   }
+  ASSERT_EQ(true, at_least_one_recognized);
 }
 
 TEST(GrammarInline, Recog) {

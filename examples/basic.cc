@@ -60,6 +60,7 @@ int main(int argc, char* argv[]) {
       .credentials(username.c_str(), password.c_str())
       .connectOnRecognize(false)
       .autoClose(false)
+      .maxWaitSeconds(1000)
       .build();
 
   audio = std::make_shared<FileAudioSource>(audio_file);
@@ -70,6 +71,7 @@ int main(int argc, char* argv[]) {
   std::vector<RecognitionResult> result = asr->waitRecognitionResult();
   std::cout << "Recognition end" << std::endl;
 
+  int j = 0;
   for (RecognitionResult& res : result) {
     if (res.getCode() == RecognitionResult::Code::NO_MATCH) {
       std::cout << "NO_MATCH" << std::endl;
@@ -78,7 +80,8 @@ int main(int argc, char* argv[]) {
 
     int i = 0;
     for (RecognitionResult::Alternative& alt : res.getAlternatives()) {
-      std::cout << "Alternativa [" << ++i
+      std::cout << "Res [" << j
+                << "] Alt [" << ++i
                 << "] (score = " << alt.getConfidence()
                 << "): " << alt.getText() << std::endl;
       int j = 0;
@@ -87,6 +90,7 @@ int main(int argc, char* argv[]) {
                   << "]: " << interpretation.text_ << std::endl;
       }
     }
+    j++;
   }
   //   } catch (std::exception& e) {
   //     std::cout << e.what() << std::endl;

@@ -57,6 +57,11 @@ RecognitionResult::Alternative::getInterpretations() {
   return interpretations_;
 }
 
+std::vector<Word>
+RecognitionResult::Alternative::getWords() {
+  return words_;
+}
+
 RecognitionResult::Alternative &RecognitionResult::Alternative::languageModel(
     std::string lang_model) {
   lang_model_ = lang_model;
@@ -73,6 +78,19 @@ RecognitionResult::Alternative &
 RecognitionResult::Alternative::addInterpretation(std::string text,
                                                   int confidence) {
   interpretations_.push_back({text, confidence});
+  return *this;
+}
+
+RecognitionResult::Alternative &
+RecognitionResult::Alternative::addWord(Word word) {
+  words_.push_back(word);
+  return *this;
+}
+
+RecognitionResult::Alternative &
+RecognitionResult::Alternative::addWord(std::string text, int confidence,
+                                        float start_time, float end_time) {
+  words_.push_back({text, confidence, start_time, end_time});
   return *this;
 }
 

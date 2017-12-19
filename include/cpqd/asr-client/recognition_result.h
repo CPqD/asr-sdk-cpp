@@ -22,7 +22,7 @@
 
 class RecognitionResult {
  public:
-  enum class Code {
+  enum Code {
     PROCESSING,
     RECOGNIZED,
     NO_MATCH,
@@ -71,15 +71,11 @@ struct Interpretation {
   int confidence_;
 };
 
-struct WordConfidence {
-  std::string word_;
+struct Word {
+  std::string text_;
   int confidence_;
-};
-
-struct WordAlignment {
-  std::string word_;
-  int start_time_;
-  int end_time_;
+  float start_time_;
+  float end_time_;
 };
 
 class RecognitionResult::Alternative {
@@ -87,20 +83,23 @@ class RecognitionResult::Alternative {
   int getConfidence();
   std::string getText();
   std::vector<Interpretation> getInterpretations();
+  std::vector<Word> getWords();
 
   RecognitionResult::Alternative& languageModel(std::string lang_model);
   RecognitionResult::Alternative& text(std::string text);
   RecognitionResult::Alternative& addInterpretation(std::string text,
                                             int confidence = 0);
   RecognitionResult::Alternative& confidence(int confidence);
+  RecognitionResult::Alternative& addWord(Word word);
+  RecognitionResult::Alternative& addWord(std::string text, int confidence,
+                                          float start_time, float end_time);
 
  private:
   std::string lang_model_;
   std::string text_;
   int confidence_ = 0;
   std::vector<Interpretation> interpretations_;
-  std::vector<WordConfidence> wordConfidence_;
-  std::vector<WordAlignment> wordAlignment_;
+  std::vector<Word> words_;
 };
 
 #endif  // INCLUDE_CPQD_ASR_CLIENT_RECOGNITION_RESULT_H_

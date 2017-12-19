@@ -22,8 +22,44 @@
 
 #include "src/message_utils.h"
 
+RecognitionResult recognitionResultFromJson(json11::Json json){
+  RecognitionResult res(json["result_status"].string_value());
+  for (auto &k : json["alternatives"].array_items()) {
+    RecognitionResult::Alternative alt;
+
+    int score = k["score"].int_value();
+    alt.confidence(score).text(k["text"].string_value());
+    for (auto &interp : k["interpretations"].array_items()) {
+      alt.addInterpretation(interp.string_value());
+    }
+    for (auto &word : k["words"].array_items()) {
+      alt.addWord(word["text"].string_value(),
+                  word["score"].int_value(),
+                  word["start_time"].number_value(),
+                  word["end_time"].number_value());
+    }
+    res.addAlternatives(alt);
+  }
+  return res;
+}
+
+PartialRecognition partialRecognitionFromJson(json11::Json json){
+  // Partial result case
+  auto k = json["alternatives"].array_items()[0];
+  PartialRecognition partial;
+  partial.text_ = k["text"].string_value();
+
+  // Default segment index is 0 (pre-3.0)
+  partial.speech_segment_index_ = 0;
+  if(json["segment_index"].is_number()){
+    partial.speech_segment_index_ = json["segment_index"].int_value();
+  }
+  return partial;
+}
+
+
 bool ASRProcessResult::handle(SpeechRecognizer::Impl &impl,
-                ASRMessageResponse &response) {
+                              ASRMessageResponse &response) {
   std::string method = split(response.get_start_line(), ' ')[2];
   if (method != getMethodString(Method::RecognitionResult)) {
     return ASRProcessMsg::handle(impl, response);
@@ -43,58 +79,16 @@ bool ASRProcessResult::handle(SpeechRecognizer::Impl &impl,
 
   std::string result_status = getString(ASRProcessResult::Header::ResultStatus);
   value = response.get_header(result_status);
+//  std::cout << response.get_extra() << std::endl;
 
   if (value == RecognitionResult::getString(ResultStatus::CANCELED)) {
     // On CANCEL, do not populate result list
     impl.recognizing_ = false;
     impl.cv_.notify_one();
     return false;
-  } else if (value == RecognitionResult::getString(ResultStatus::RECOGNIZED)) {
-    std::string err;
-    auto json = json11::Json::parse(response.get_extra(), err);
-
-    for (auto &k : json["alternatives"].array_items()) {
-      RecognitionResult::Alternative alt;
-
-      int score = k["score"].int_value();
-      alt.confidence(score).text(k["text"].string_value());
-      for (auto &interp : k["interpretations"].array_items()) {
-        alt.addInterpretation(interp.string_value());
-      }
-
-      RecognitionResult res;
-      res.addAlternatives(alt);
-
-      impl.result_.push_back(res);
-    }
-
-    // invoking result callback
-    for (RecognitionResult &res : impl.result_) {
-      for (std::unique_ptr<RecognitionListener>& listener : impl.listener_) {
-        listener->onRecognitionResult(res);
-      }
-    }
-
-    impl.recognizing_ = false;
-    impl.cv_.notify_one();
-    return true;
-  } else if (value == RecognitionResult::getString(ResultStatus::PROCESSING)) {
-    std::string err;
-    auto json = json11::Json::parse(response.get_extra(), err);
-
-    auto k = json["alternatives"].array_items()[0];
-    PartialRecognition partial;
-    partial.text_ = k["text"].string_value();
-    partial.speech_segment_index_ = 0; //TODO index not yet implemented
-
-    // invoking partial result callback
-    for (std::unique_ptr<RecognitionListener>& listener : impl.listener_) {
-      listener->onPartialRecognition(partial);
-    }
-    return true;
   }
-  else {
-    // Default case populates result with an empty list and returns status
+  else if (response.get_extra().empty()){
+    // On empty body, assume no result with only the header status
     RecognitionResult res(value);
     impl.result_.push_back(res);
 
@@ -108,6 +102,48 @@ bool ASRProcessResult::handle(SpeechRecognizer::Impl &impl,
     impl.recognizing_ = false;
     impl.cv_.notify_one();
     return false;
+  }
+  else {
+    std::string err;
+    json11::Json json = json11::Json::parse(response.get_extra(), err);
+
+    // Behaviour of variables pre-3.0
+    bool final_result = value == RecognitionResult::getString(ResultStatus::RECOGNIZED);
+    bool last_segment = true;
+
+    // On 3.0, the aforedefined variables are present in the body of the message
+    if(json["final_result"].is_bool())
+      final_result = json["final_result"].bool_value();
+    if(json["last_segment"].is_bool())
+      last_segment = json["last_segment"].bool_value();
+
+    if (final_result) {
+      // Final result case
+      auto res = recognitionResultFromJson(json);
+      impl.result_.push_back(res);
+
+      // invoking result callback
+      for (std::unique_ptr<RecognitionListener>& listener : impl.listener_) {
+        listener->onRecognitionResult(res);
+      }
+
+      // Default behaviour in the absence of the "last_segment" field in json is
+      // assuming last_segment=true (pre-3.0)
+      if(last_segment){
+        impl.recognizing_ = false;
+        impl.cv_.notify_one();
+      }
+
+      return true;
+    } else {
+      auto partial = partialRecognitionFromJson(json);
+
+      // invoking partial result callback
+      for (std::unique_ptr<RecognitionListener>& listener : impl.listener_) {
+        listener->onPartialRecognition(partial);
+      }
+      return true;
+    }
   }
 }
 
