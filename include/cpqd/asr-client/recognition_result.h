@@ -51,12 +51,22 @@ class RecognitionResult {
     return alternatives_;
   }
 
+  bool isLastSpeechSegment() {
+    return last_segment_;
+  }
+
+  void setLastSpeechSegment(bool last_segment) {
+    last_segment_= last_segment;
+  }
+
   RecognitionResult& addAlternatives(const Alternative& alt);
   
   static std::string getString(RecognitionResult::Code st);
 
  private:
   Code result_status_;
+
+  bool last_segment_;
 
   std::vector<Alternative> alternatives_;
 };

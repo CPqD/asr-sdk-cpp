@@ -121,6 +121,7 @@ bool ASRProcessResult::handle(SpeechRecognizer::Impl &impl,
       // Final result case
       auto res = recognitionResultFromJson(json);
       impl.result_.push_back(res);
+      res.setLastSpeechSegment(last_segment);
 
       // invoking result callback
       for (std::unique_ptr<RecognitionListener>& listener : impl.listener_) {
