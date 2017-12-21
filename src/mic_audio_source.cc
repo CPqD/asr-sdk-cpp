@@ -66,6 +66,12 @@ void MicAudioSource::open(){
                                std::string("No available input devices."));
   }
   params_->device = Pa_GetDefaultInputDevice();
+// TODO: deal with fancy microphones (USB and whatnot)i
+//  for (int i = 0, end = Pa_GetDeviceCount(); i != end; ++i) {
+//      PaDeviceInfo const* info = Pa_GetDeviceInfo(i);
+//      if (!info) continue;
+//      std::cout << i << ": " << info->name << std::endl;
+//  }
   int framesPerBuffer = MIC_BUFFER_SIZE_BYTES * 8 / fmt_.bits_per_sample_;
   err_ = Pa_OpenStream(&stream_,
                        params_.get(),
