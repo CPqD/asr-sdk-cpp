@@ -20,6 +20,7 @@
 #include <cpqd/asr-client/audio_source.h>
 
 #include <memory>
+#include <mutex>
 
 class BufferAudioSource : public AudioSource {
  public:
@@ -42,6 +43,8 @@ class BufferAudioSource : public AudioSource {
 
  private:
   std::shared_ptr<Impl> impl_ = nullptr;
+
+  std::mutex mtx_;
 };
 
 #endif  // INCLUDE_CPQD_ASR_CLIENT_BUFFER_AUDIO_SOURCE_H_

@@ -28,6 +28,8 @@ class BufferAudioSource::Impl {
     RingBuffer ring_buffer_;
 
     std::atomic<bool> finished_{false};
+
+    std::atomic<bool> to_read_{false};
 };
 
 BufferAudioSource::BufferAudioSource(AudioFormat fmt, size_t buffer_size) :
@@ -38,27 +40,33 @@ BufferAudioSource::BufferAudioSource(AudioFormat fmt, size_t buffer_size) :
 BufferAudioSource::~BufferAudioSource() {}
 
 int BufferAudioSource::read(std::vector<char> &buffer) {
-  int ret = impl_->ring_buffer_.ReadAll(buffer);
-
-  if (impl_->finished_)
+  std::unique_lock<std::mutex> l(mtx_);
+  if (impl_->finished_ && !impl_->to_read_)
     return -1;
+
+  int ret = impl_->ring_buffer_.ReadAll(buffer);
+  impl_->to_read_ = false;
 
   return ret;
 }
 
 bool BufferAudioSource::write(std::vector<char> &buffer) {
+  std::unique_lock<std::mutex> l(mtx_);
   if (impl_->finished_)
     return false;
 
   impl_->ring_buffer_.Write(buffer.data(), buffer.size());
+  impl_->to_read_ = true;
   return true;
 }
 
 bool BufferAudioSource::write(char* buffer, size_t size) {
+  std::unique_lock<std::mutex> l(mtx_);
   if (impl_->finished_)
     return false;
 
   impl_->ring_buffer_.Write(buffer, size);
+  impl_->to_read_ = true;
   return true;
 }
 
