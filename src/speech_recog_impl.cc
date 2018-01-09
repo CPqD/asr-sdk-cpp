@@ -65,7 +65,20 @@ void SpeechRecognizer::Impl::open(const std::string& url,
     { return status_ != SpeechRecognizer::Impl::Status::kConnecting;}
     );
   }
-  open_ = true;
+  if (status_ != SpeechRecognizer::Impl::Status::kOpen) {
+    auto code = RecognitionError::Code::CONNECTION_FAILURE;
+    std::string msg("Failure on connecting to server " + url);
+    RecognitionError error(code, msg);
+    for (std::unique_ptr<RecognitionListener>& listener : listener_)
+      listener->onError(error);
+    // Connection error shouldn't be ignorable, as pretty much nothing can be
+    // done with the SpeechRecognition instance if a connection isn't
+    // estabilished
+    throw RecognitionException(code, msg);
+  }
+  else{
+    open_ = true;
+  }
 }
 
 

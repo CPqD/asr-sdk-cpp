@@ -24,6 +24,7 @@
 #include <cpqd/asr-client/recognition_config.h>
 #include <cpqd/asr-client/speech_recog.h>
 #include <cpqd/asr-client/recognition_listener.h>
+#include <cpqd/asr-client/recognition_exception.h>
 
 class TestListener : public RecognitionListener {
 public:
@@ -72,11 +73,18 @@ TEST(RecognizerBuildTest, urlNull) {
 }
 
 TEST(RecognizerBuildTest, urlInvalid) {
-  std::string url = "ws://xpto";
+  std::string url = "xpto";
 
   ASSERT_THROW(SpeechRecognizer::Builder().serverUrl(url).build(),
                std::invalid_argument);
 }
+
+TEST(RecognizerBuildTest, urlInexistent) {
+  std::string url = "ws://xpto";                                                                                                          
+  ASSERT_THROW(SpeechRecognizer::Builder().serverUrl(url).build(),
+               RecognitionException);
+}
+
 
 TEST(RecognizerBuildTest, addListener) {
   std::unique_ptr<RecognitionConfig> config =

@@ -47,12 +47,8 @@ void SpeechRecognizer::resetImpl() {
 
   // Only connect if connect_on_recognize_ is false, i.e. if we are in the
   // default behaviour
-  if(!properties_->connect_on_recognize_){
+  if(!properties_->connect_on_recognize_) {
     impl_->open(properties_->url_, properties_->user_, properties_->passwd_);
-    if (impl_->eptr_) {
-      close();
-      std::rethrow_exception(impl_->eptr_);
-    }
     // connect_on_recognize_ = false and auto_close_ = true has
     // undefined behaviour, so we force both true after 1st connection
     if(properties_->auto_close_){
@@ -114,8 +110,9 @@ void SpeechRecognizer::recognize(
   // Only try to connect if connection is closed. This will be true
   // if connect_on_recognize_ is true or if auto_close is true and we already
   // performed one recognition
-  if(!impl_->open_)
+  if(!impl_->open_){
     impl_->open(properties_->url_, properties_->user_, properties_->passwd_);
+  }
 
   ASRSendMessage send_msg_;
   if (impl_->session_status_ == SpeechRecognizer::Impl::SessionStatus::kNone) {
