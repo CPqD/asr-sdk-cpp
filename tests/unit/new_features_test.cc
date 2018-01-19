@@ -21,6 +21,7 @@
 #include <chrono>
 #include <string>
 #include <thread>
+#include <fstream>
 
 #include <cpqd/asr-client/file_audio_source.h>
 #include <cpqd/asr-client/buffer_audio_source.h>
@@ -137,3 +138,35 @@ TEST(RecognizerTest, wordsGrammar) {
   }
   ASSERT_EQ(true, at_least_one_high_confidence) << "No results with high confidence!";
 }
+
+TEST(RecognizerTest, dynamicGrammarMulti) {
+  std::ifstream fs_gram(test::grammar_pizza_path);
+  std::stringstream buffer;
+  buffer << fs_gram.rdbuf();
+  std::string str_gram = buffer.str();
+  std::unique_ptr<LanguageModelList> lm =
+      LanguageModelList::Builder().addInlineGrammar(str_gram).build();
+  std::shared_ptr<AudioSource> audio =
+      std::make_shared<FileAudioSource>(test::audio_pizza_multi_8k);
+  std::unique_ptr<SpeechRecognizer> asr = defaultBuild();
+  
+  asr->recognize(audio, std::move(lm));
+  std::vector<RecognitionResult> result = asr->waitRecognitionResult();
+  asr->close();
+
+  ASSERT_LT(0, result.size());
+  int num_res = 0;
+  for (RecognitionResult& res : result) {
+    if(res.getCode() != RecognitionResult::Code::RECOGNIZED){
+      continue;
+    }
+    num_res++;
+
+    for (RecognitionResult::Alternative& alt : res.getAlternatives()) {
+      std::cout << "alt.getConfidence(): " << alt.getConfidence() << std::endl;
+      std::cout << alt.getText() << std::endl;
+    }
+  }
+  ASSERT_EQ(3, num_res) << "Number of results (segments) should be 3!";
+}
+

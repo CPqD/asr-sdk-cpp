@@ -1,0 +1,69 @@
+#ABNF 1.0 UTF-8;
+language pt-BR;
+tag-format <semantics/1.0-literals>;
+mode voice;
+
+// ============================================================================
+// Sample grammar: pizza.gram
+// This is a grammar used to order pizza.
+// ============================================================================
+
+root $order;
+
+$order = [$want] $pizza [por favor | por gentileza];
+
+$want = [eu] (quero | queria | gostaria de) [uma];
+
+$pizza = [pizza | de | pizza de] $flavor;
+
+$flavor =   aliche {pizza_aliche} |
+            bacon {pizza_bacon} |
+            baiana {pizza_baiana} |
+            bauru {pizza_bauru} |
+            brasileira {pizza_brasileira} |
+            carbonara {pizza_carbonara} |
+            carioca {pizza_carioca} |
+            catupiry {pizza_catupiry} |
+            chilena {pizza_chilena} |
+            coreana {pizza_coreana} |
+            dois queijos {pizza_2queijos} |
+            escarola {pizza_escarola} |
+            fiorentina {pizza_fiorentina} |
+            florença {pizza_florença} |
+            francesa {pizza_francesa} |
+            frango {pizza_frango} |
+            frango caipira {pizza_frango_caipira} |
+            grega {pizza_grega} |
+            indonésia {pizza_indonésia} |
+            jaguaré {pizza_jaguaré} |
+            londrina {pizza_londrina} |
+            madri {pizza_madri} |
+            maluca {pizza_maluca} |
+            marguerita {pizza_marguerita} |
+            milho especial {pizza_milho_especial} |
+            milho verde {pizza_milho_verde} |
+            moda antiga {pizza_moda_antiga} |
+            moda da casa {pizza_moda_casa} |
+            napolitana {pizza_napolitana} |
+            paulista {pizza_paulista} |
+            pizzaiolo {pizza_pizzaiolo} |
+            polonesa {pizza_polonesa} |
+            presunto {pizza_presunto} |
+            provolone {pizza_provolone} |
+            quatro queijos {pizza_4queijos} |
+            romana {pizza_romana} |
+            três queijos {pizza_3queijos} |
+            vegetariana {pizza_vegetariana} |
+            verona {pizza_verona} |
+            viena {pizza_viena} |
+            vinagrete {pizza_vinagrete} |
+            calabresa {pizza_calabresa} |
+            frango com catupiry {pizza_frango_catupiry} |
+            mussarela {pizza_mussarela} |
+            muçarela {pizza_muçarela} |
+            queijo {pizza_queijo} |
+            portuguesa {pizza_portuguesa} |
+            toscana {pizza_toscana};
+
+
+// ============================================================================
