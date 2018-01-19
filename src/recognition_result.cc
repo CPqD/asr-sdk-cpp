@@ -25,7 +25,6 @@ RecognitionResult::RecognitionResult(Code result_status)
 {}
 
 RecognitionResult::RecognitionResult(std::string status_string){
-  result_status_ == Code::NO_MATCH;
   if(status_string == "PROCESSING")
     result_status_ = Code::NO_MATCH;
   else if (status_string == "RECOGNIZED")
