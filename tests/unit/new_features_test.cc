@@ -22,6 +22,7 @@
 #include <string>
 #include <thread>
 #include <fstream>
+#include <cmath>
 
 #include <cpqd/asr-client/file_audio_source.h>
 #include <cpqd/asr-client/buffer_audio_source.h>
@@ -38,7 +39,8 @@
  *
  * ok:         wordsSlm
  * ok:         wordsGrammar
- * TODO:       multipleSegments
+ * ok:         multipleSegments (dynamicGrammarMulti)
+ * ok:         dynamicGrammar   (dynamicGrammarMulti)
  */
 
 
@@ -156,10 +158,16 @@ TEST(RecognizerTest, dynamicGrammarMulti) {
 
   ASSERT_LT(0, result.size());
   int num_res = 0;
+  
+  // Defined as the result from the default configuration of the engine v3.1.1
+  static float start_times[] = {1.96, 8.05, 11.62};
+  static float end_times[] = {4.24, 9.67, 14.54};
   for (RecognitionResult& res : result) {
     if(res.getCode() != RecognitionResult::Code::RECOGNIZED){
       continue;
     }
+    ASSERT_LE(abs(start_times[num_res] - res.startTime()), .3) << "Start time deviated more than 300ms!";
+    ASSERT_LE(abs(end_times[num_res] - res.endTime()), .3) << "End time deviated more than 300ms!";
     num_res++;
 
     for (RecognitionResult::Alternative& alt : res.getAlternatives()) {

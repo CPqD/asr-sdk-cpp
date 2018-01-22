@@ -54,10 +54,27 @@ class RecognitionResult {
   bool isLastSpeechSegment() {
     return last_segment_;
   }
+  
+  float startTime(){
+    return start_time_;
+  }
+  
+  float endTime(){
+    return end_time_;
+  }
 
   void setLastSpeechSegment(bool last_segment) {
     last_segment_= last_segment;
   }
+
+  void setStartTime(float start_time){
+    start_time_ = start_time;
+  }
+  
+  void setEndTime(float end_time){
+    end_time_ = end_time;
+  }
+
 
   RecognitionResult& addAlternatives(const Alternative& alt);
   
@@ -69,6 +86,9 @@ class RecognitionResult {
   bool last_segment_;
 
   std::vector<Alternative> alternatives_;
+  
+  float start_time_ = -1;
+  float end_time_ = -1;
 };
 
 struct PartialRecognition {

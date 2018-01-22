@@ -120,6 +120,10 @@ bool ASRProcessResult::handle(SpeechRecognizer::Impl &impl,
     if (final_result) {
       // Final result case
       auto res = recognitionResultFromJson(json);
+      if(json["start_time"].is_number())
+        res.setStartTime(json["start_time"].number_value());
+      if(json["end_time"].is_number())
+        res.setEndTime(json["end_time"].number_value());
       impl.result_.push_back(res);
       res.setLastSpeechSegment(last_segment);
 
