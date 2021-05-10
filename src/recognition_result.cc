@@ -131,3 +131,39 @@ std::string RecognitionResult::getString(RecognitionResult::Code st) {
     return "FAILURE";
   }
 }
+
+std::string RecognitionResult::Classifier::getAge() {
+  return age_;
+}
+
+std::string RecognitionResult::Classifier::getEmotion() {
+  return emotion_;
+}
+
+std::string RecognitionResult::Classifier::getGender() {
+  return gender_;
+}
+
+void RecognitionResult::Classifier::setAge(std::string& age) {
+  age_ = age;
+}
+
+void RecognitionResult::Classifier::setEmotion(std::string& emotion) {
+  emotion_ = emotion;
+}
+
+void RecognitionResult::Classifier::setGender(std::string& gender) {
+  gender_ = gender;
+}
+
+bool RecognitionResult::Classifier::hasAge() {
+  return !age_.empty();
+}
+
+bool RecognitionResult::Classifier::hasEmotion() {
+  return !emotion_.empty();
+}
+
+bool RecognitionResult::Classifier::hasGender() {
+  return !gender_.empty();
+}

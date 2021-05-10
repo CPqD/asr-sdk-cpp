@@ -34,6 +34,9 @@ class RecognitionConfig {
     unsigned int recog_timeout_seconds_ = 0;
     bool no_input_timeout_enabled_ = false;
     bool recog_timeout_enabled_ = false;
+    bool infer_age_enabled_ = false;
+    bool infer_gender_enabled_ = false;
+    bool infer_emotion_enabled_ = false;
     unsigned int head_margin_milliseconds_ = 0;
     unsigned int tail_margin_milliseconds_ = 0;
     unsigned int wait_end_milliseconds_ = 0;
@@ -59,6 +62,9 @@ class RecognitionConfig {
   unsigned int recognitionTimeoutSeconds();
   bool noInputTimeoutEnabled();
   bool recognitionTimeoutEnabled();
+  bool inferAgeEnabled();
+  bool inferEmotionEnabled();
+  bool inferGenderEnabled();
   unsigned int headMarginMilliseconds();
   unsigned int tailMarginMilliseconds();
   unsigned int waitEndMilliseconds();
@@ -87,6 +93,9 @@ class RecognitionConfig::Builder {
   RecognitionConfig::Builder& recognitionTimeoutSeconds(unsigned int value);
   RecognitionConfig::Builder& noInputTimeoutEnabled(bool value);
   RecognitionConfig::Builder& recognitionTimeoutEnabled(bool value);
+  RecognitionConfig::Builder& inferAgeEnabled(bool value);
+  RecognitionConfig::Builder& inferEmotionEnabled(bool value);
+  RecognitionConfig::Builder& inferGenderEnabled(bool value);
   RecognitionConfig::Builder& headMarginMilliseconds(unsigned int value);
   RecognitionConfig::Builder& tailMarginMilliseconds(unsigned int value);
   RecognitionConfig::Builder& waitEndMilliseconds(unsigned int value);

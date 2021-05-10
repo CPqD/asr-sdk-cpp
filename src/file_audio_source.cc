@@ -42,17 +42,22 @@ FileAudioSource::FileAudioSource(const std::string& file_name, AudioFormat fmt)
 
   ifs_.open(file_name_, std::ifstream::in | std::ifstream::binary);
 
-  if(file_name.substr(file_name.find_last_of(".") + 1) == "wav") {
-    WavHeader header;
+  if(file_name.substr(file_name.find_last_of(".") + 1) != "raw") {
 
-    ifs_.read(reinterpret_cast<char*>(&header), sizeof(WavHeader));
-    datachunk_size_ = header.datachunk_size;
-    fmt_.sample_rate_ = header.sample_rate;
-    fmt_.bits_per_sample_ = header.bps;
-    return;
+    if(file_name.substr(file_name.find_last_of(".") + 1) == "wav") {
+      WavHeader header;
+      ifs_.read(reinterpret_cast<char*>(&header), sizeof(WavHeader));
+      datachunk_size_ = header.datachunk_size;
+      fmt_.sample_rate_ = header.sample_rate;
+      fmt_.bits_per_sample_ = header.bps;
+    }
+    // Now ASR support audio headers
+    ifs_.seekg(0);
+    fmt_.fileFormat = AudioFileFormat::WAV;
+
+  } else {
+    fmt_.fileFormat = AudioFileFormat::RAW;
   }
-
-  fmt_.fileFormat = AudioFileFormat::RAW;
   datachunk_size_ = ifs_.tellg();
 }
 
