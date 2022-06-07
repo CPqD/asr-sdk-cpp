@@ -49,7 +49,10 @@ int main(int argc, char* argv[]) {
       .inferAgeEnabled(classifiers)
       .inferEmotionEnabled(classifiers)
       .inferGenderEnabled(classifiers)
+      .accountTag("my-account")
       .build();
+
+  config->getConfigFromEvironment();
 
   std::unique_ptr<LanguageModelList> lm;
 

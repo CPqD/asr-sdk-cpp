@@ -43,6 +43,41 @@ Supomos que esteja usando modelos para áudio de 8kHz, caso contrário, deve tes
 
     ./basic ws://127.0.0.1:8025/asr-server/asr builtin:grammar/samples/phone ../../examples/audio/phone-1937050211-16k.wav
 
+#### Utilizando parâmetros
+
+Os seguites parâmetros podem ser controlados pela variável de ambiente correspondente:
+
++---------------------------------+---------------------------------+-----------+
+|  Nome do parâmetro              |  Variável de ambiente           |  Tipo     |
+|---------------------------------|---------------------------------|-----------|
+|  decoder.confidenceThreshold    |  CONFIDENCE_THRESHOLD           |  Inteiro  |
+|  decoder.maxSentences           |  MAX_SENTENCES                  |  Inteiro  |
+|  noInputTimeout.value           |  NO_INPUT_TIMEOUT_MILLISECONDS  |  Inteiro  |
+|  recognitionTimeout.value       |  RECOG_TIMEOUT_SECONDS          |  Inteiro  |
+|  noInputTimeout.enabled         |  NO_INPUT_TIMEOUT_ENABLED       |  Bool     |
+|  recognitionTimeout.enabled     |  RECOG_TIMEOUT_ENABLED          |  Bool     |
+|  Infer-age-enabled |            |  INFER_AGE_ENABLED              |  Bool     |
+|  Infer-emotion-enabled          |  INFER_EMOTION_ENABLED          |  Bool     |
+|  Infer-gender-enabled           |  INFER_GENDER_ENABLED           |  Bool     |
+|  endpointer.headMargin          |  HEAD_MARGIN_MILLISECONDS       |  Inteiro  |
+|  endpointer.tailMargin          |  TAIL_MARGIN_MILLISECONDS       |  Inteiro  |
+|  endpointer.waitEnd             |  WAIT_END_MILLISECONDS          |  Inteiro  |
+|  decoder.continuousMode         |  CONTINUOUS_MODE                |  Bool     |
+|  endpointer.maxSegmentDuration  |  MAX_SEGMENT_DURATION           |  Inteiro  |
+|  decoder.startInputTimers       |  START_INPUT_TIMERS             |  Bool     |
+|  endpointer.autoLevelLen        |  ENDPOINTER_AUTO_LEVEL_LEN      |  Inteiro  |
+|  endpointer.levelMode           |  ENDPOINTER_LEVEL_MODE          |  Inteiro  |
+|  endpointer.levelThreshold      |  ENDPOINTER_LEVEL_THRESHOLD     |  Inteiro  |
+|  Ver-Buffer-Utterance           |  VERIFY_BUFFER_UTTERANCE        |  Bool     |
+|  licenseManager.accountTag      |  ACCOUNT_TAG                    |  String   |
+|  Channel-Identifier             |  CHANNEL_IDENTIFIER             |  String   |
+|  Media-Type                     |  MEDIA_TYPE                     |  String   |
++---------------------------------+---------------------------------+-----------+
+
+Observação: para os parâmetros do tipo *Bool* a simples existência da variável de ambiente corresponde ao valor **true**.
+
+O Documentação destes parâmetros pode ser encontrada em [ASR Docs](https://speechweb.cpqd.com.br/asr/docs/latest/)
+
 ### Usando a biblioteca em aplicações
 
 A biblioteca cliente pode ser usada em sua aplicação através do arquivo

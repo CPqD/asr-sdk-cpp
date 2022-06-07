@@ -80,7 +80,7 @@ PartialRecognition partialRecognitionFromJson(json11::Json json){
 bool ASRProcessResult::handle(SpeechRecognizer::Impl &impl,
                               ASRMessageResponse &response) {
   std::string method = split(response.get_start_line(), ' ')[2];
-  if (method != getMethodString(Method::RecognitionResult)) {
+  if (method.find(getMethodString(Method::RecognitionResult)) == std::string::npos) {
     return ASRProcessMsg::handle(impl, response);
   }
 

@@ -20,6 +20,8 @@
 #include <cctype>
 #include <iostream>
 
+#include "ws_parser.h"
+
 namespace internal {
 
 void removeExtraSpaces(std::string& input) {
@@ -39,6 +41,10 @@ void ASRMessageResponse::consume(const std::string& payload) {
   std::string msg_body = payload;
   std::string msg_extra;
 
+  cpqd::WsParser parser(payload);
+  headers_ = parser.GetParams();
+  extra_ = parser.GetBody();
+  start_line_ = "ASR 2.4 " + parser.GetCmd();
   auto start = 0U;
   auto end = payload.find(hdr_delimiter);
 

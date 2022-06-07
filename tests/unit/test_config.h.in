@@ -2,11 +2,13 @@
 
 namespace test {
 
-const std::string server_url = "ws://portuguesa.cpqd.com.br:8025/asr-server/asr";
+const std::string server_url = "ws://127.0.0.1:8025/asr-server/asr";
+const std::string mock_url = "ws://127.0.0.1:9002/mock";
+const std::string tls_mock_url = "wss://127.0.0.1:9003/mock";
 const std::string username = "";
 const std::string password = "";
 
-const std::string grammar_phone_uri  = "builtin:grammar/samples/phone";
+const std::string grammar_phone_uri  = "builtin:grammar/phone";
 const std::string slm_uri            = "builtin:slm/general";
 const std::string grammar_pizza_path = "${CMAKE_CURRENT_SOURCE_DIR}/res/grammar/pizza.gram";
 

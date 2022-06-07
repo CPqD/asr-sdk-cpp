@@ -23,7 +23,7 @@ include_directories (${JSON11_INCLUDE_DIRS})
 include_directories (${OPENSSL_INCLUDE_DIRS})
 include_directories (${PORTAUDIO_INCLUDE_DIRS})
 
-file (GLOB SOURCE_FILES "*.cc" "*.cpp")
+file (GLOB SOURCE_FILES "*.cc" "*.cpp" ${CMAKE_SOURCE_DIR}/src/aux/*.cc)
 file (GLOB HEADER_FILES "*.h" "*.hpp")
 
 init_target (asr-client)

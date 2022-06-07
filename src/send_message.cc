@@ -52,10 +52,16 @@ void ASRSendMessage::setParameters(SpeechRecognizer::Impl &impl) {
   unsigned int head_margin_milliseconds = impl.config_->headMarginMilliseconds();
   unsigned int tail_margin_milliseconds = impl.config_->tailMarginMilliseconds();
   unsigned int wait_end_milliseconds = impl.config_->waitEndMilliseconds();
+  bool continuous_mode = impl.config_->continuousMode();
+  unsigned int max_segment_duration = impl.config_->maxSegmentDuration();
   bool start_input_timers = impl.config_->startInputTimers();
   unsigned int endpointer_auto_level_len = impl.config_->endpointerAutoLevelLen();
   unsigned int endpointer_level_mode = impl.config_->endpointerLevelMode();
   unsigned int endpointer_level_threshold = impl.config_->endpointerLevelThreshold();
+  bool verify_buffer_utterance = impl.config_->verifyBufferUtterance();
+  std::string account_tag = impl.config_->accountTag();
+  std::string channel_identifier = impl.config_->channelIdentifier();
+  std::string media_type = impl.config_->mediaType();
 
   if (confidence_threshold)
     request.set_header("decoder.confidenceThreshold",
@@ -103,6 +109,13 @@ void ASRSendMessage::setParameters(SpeechRecognizer::Impl &impl) {
     request.set_header("endpointer.waitEnd",
                        std::to_string(wait_end_milliseconds));
 
+  if (continuous_mode) {
+    request.set_header("decoder.continuousMode", "true");
+  }
+  if (max_segment_duration)
+    request.set_header("endpointer.maxSegmentDuration",
+                       std::to_string(max_segment_duration));
+
   if (start_input_timers) {
     request.set_header("decoder.startInputTimers",
                        std::to_string(start_input_timers));
@@ -117,6 +130,22 @@ void ASRSendMessage::setParameters(SpeechRecognizer::Impl &impl) {
     if (endpointer_level_mode == 2 && endpointer_level_threshold)
       request.set_header("endpointer.levelThreshold",
                          std::to_string(endpointer_level_threshold));
+  }
+
+  if (verify_buffer_utterance) {
+    request.set_header("Ver-Buffer-Utterance", "true");
+  }
+
+  if (!account_tag.empty()) {
+      request.set_header("licenseManager.accountTag", account_tag);
+  }
+
+  if (!channel_identifier.empty()) {
+      request.set_header("Channel-Identifier", channel_identifier);
+  }
+
+  if (!media_type.empty()) {
+      request.set_header("Media-Type", media_type);
   }
 
   std::string raw_message = request.raw();

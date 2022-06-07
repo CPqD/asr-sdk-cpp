@@ -50,7 +50,7 @@ bool ASRProcessResponse::handle(SpeechRecognizer::Impl &impl,
   // TODO: Treat the version string
   std::string method_response = split(response.get_start_line(), ' ')[2];
 
-  if (method_response != getMethodString(Method::Response)) {
+  if (method_response.find(getMethodString(Method::Response)) == std::string::npos) {
     return ASRProcessMsg::handle(impl, response);
   }
 
@@ -89,7 +89,7 @@ bool ASRProcessResponse::createSession(SpeechRecognizer::Impl &impl,
   std::string key = getString(ResponseHeader::Result);
   std::string header = response.get_header(key);
 
-  if (header != getString(ResultStatus::SUCCESS)) {
+  if (header.find(getString(ResultStatus::SUCCESS)) == std::string::npos) {
     generateError(impl, response);
     return false;
   }
@@ -109,7 +109,7 @@ bool ASRProcessResponse::setParameters(SpeechRecognizer::Impl &impl,
   std::string key = getString(ResponseHeader::Result);
   std::string header = response.get_header(key);
 
-  if (header != getString(ResultStatus::SUCCESS)) {
+  if (header.find(getString(ResultStatus::SUCCESS)) == std::string::npos) {
     generateError(impl, response);
     return false;
   }
@@ -125,7 +125,7 @@ bool ASRProcessResponse::startRecog(SpeechRecognizer::Impl &impl,
   std::string key = getString(ResponseHeader::Result);
   std::string header = response.get_header(key);
 
-  if (header != getString(ResultStatus::SUCCESS)) {
+  if (header.find(getString(ResultStatus::SUCCESS)) == std::string::npos) {
     generateError(impl, response);
     return false;
   }
@@ -147,8 +147,8 @@ bool ASRProcessResponse::cancelRecog(SpeechRecognizer::Impl &impl,
 
   // Invalid action treated as successful since cancel recog shouldn't throw
   // errors if server is not recognizing anything
-  if (header != getString(ResultStatus::SUCCESS) &&
-      header != getString(ResultStatus::INVALID_ACTION)) {
+  if ((header.find(getString(ResultStatus::SUCCESS)) == std::string::npos) &&
+      (header.find(getString(ResultStatus::INVALID_ACTION)) == std::string::npos)) {
     generateError(impl, response);
     return false;
   }
@@ -265,7 +265,7 @@ std::string ASRProcessResponse::getString(ResultStatus value) {
 bool ASRProcessStartSpeech::handle(SpeechRecognizer::Impl &impl,
                                    ASRMessageResponse &response) {
   std::string method = split(response.get_start_line(), ' ')[2];
-  if (method != getMethodString(Method::StartOfSpeech)) {
+  if (method.find(getMethodString(Method::StartOfSpeech)) == std::string::npos) {
     return ASRProcessMsg::handle(impl, response);
   }
 
@@ -280,7 +280,7 @@ bool ASRProcessStartSpeech::handle(SpeechRecognizer::Impl &impl,
 bool ASRProcessEndSpeech::handle(SpeechRecognizer::Impl &impl,
                                  ASRMessageResponse &response) {
   std::string method = split(response.get_start_line(), ' ')[2];
-  if (method != getMethodString(Method::EndOfSpeech)) {
+  if (method.find(getMethodString(Method::EndOfSpeech)) == std::string::npos) {
     return ASRProcessMsg::handle(impl, response);
   }
 
