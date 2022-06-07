@@ -56,6 +56,24 @@ RecognitionConfig::Builder::recognitionTimeoutEnabled(bool value) {
   return *this;
 }
 
+RecognitionConfig::Builder &
+RecognitionConfig::Builder::inferAgeEnabled(bool value) {
+  properties_.infer_age_enabled_ = value;
+  return *this;
+}
+
+RecognitionConfig::Builder &
+RecognitionConfig::Builder::inferEmotionEnabled(bool value) {
+  properties_.infer_emotion_enabled_ = value;
+  return *this;
+}
+
+RecognitionConfig::Builder &
+RecognitionConfig::Builder::inferGenderEnabled(bool value) {
+  properties_.infer_gender_enabled_ = value;
+  return *this;
+}
+
 RecognitionConfig::Builder &RecognitionConfig::Builder::headMarginMilliseconds(
     unsigned int value) {
   properties_.head_margin_milliseconds_ = value;
@@ -130,6 +148,18 @@ bool RecognitionConfig::noInputTimeoutEnabled() {
 
 bool RecognitionConfig::recognitionTimeoutEnabled() {
   return properties_.recog_timeout_enabled_;
+}
+
+bool RecognitionConfig::inferAgeEnabled() {
+  return properties_.infer_age_enabled_;
+}
+
+bool RecognitionConfig::inferEmotionEnabled() {
+  return properties_.infer_emotion_enabled_;
+}
+
+bool RecognitionConfig::inferGenderEnabled() {
+  return properties_.infer_gender_enabled_;
 }
 
 unsigned int RecognitionConfig::headMarginMilliseconds() {

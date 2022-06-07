@@ -39,7 +39,26 @@ RecognitionResult recognitionResultFromJson(json11::Json json){
                   word["end_time"].number_value());
     }
     res.addAlternatives(alt);
+    // age scores
+    auto as= json["age_scores"];
+    if (as.is_object() && !as.object_items().empty()) {
+      std::string age = std::to_string(as["age"].number_value());
+      res.getClassifiers().setAge(age);
+    }
+    // emotion scores
+    auto es= json["emotion_scores"];
+    if (es.is_object() && !es.object_items().empty()) {
+      std::string emotion = es["emotion"].string_value();
+      res.getClassifiers().setEmotion(emotion);
+    }
+    // gender scores
+    auto gs= json["gender_scores"];
+    if (gs.is_object() && !gs.object_items().empty()) {
+      std::string gender = gs["gender"].string_value();
+      res.getClassifiers().setGender(gender);
+    }
   }
+
   return res;
 }
 

@@ -37,6 +37,23 @@ class RecognitionResult {
 
   class Alternative;
 
+  class Classifier {
+   public:
+    std::string getAge();
+    std::string getEmotion();
+    std::string getGender();
+    void setAge(std::string& age);
+    void setEmotion(std::string& emotion);
+    void setGender(std::string& gender);
+    bool hasAge();
+    bool hasEmotion();
+    bool hasGender();
+   private:
+    std::string age_;
+    std::string emotion_;
+    std::string gender_;
+  };
+
   RecognitionResult();
   
   RecognitionResult(Code result_status);
@@ -77,7 +94,10 @@ class RecognitionResult {
 
 
   RecognitionResult& addAlternatives(const Alternative& alt);
-  
+  Classifier& getClassifiers() {
+    return classfiers_;
+  }
+
   static std::string getString(RecognitionResult::Code st);
 
  private:
@@ -86,6 +106,7 @@ class RecognitionResult {
   bool last_segment_;
 
   std::vector<Alternative> alternatives_;
+  Classifier classfiers_;
   
   float start_time_ = -1;
   float end_time_ = -1;

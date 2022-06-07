@@ -46,6 +46,9 @@ void ASRSendMessage::setParameters(SpeechRecognizer::Impl &impl) {
   unsigned int recog_timeout_seconds = impl.config_->recognitionTimeoutSeconds();
   bool no_input_timeout_enabled = impl.config_->noInputTimeoutEnabled();
   bool recog_timeout_enabled = impl.config_->recognitionTimeoutEnabled();
+  bool infer_age_enabled = impl.config_->inferAgeEnabled();
+  bool infer_emotion_enabled = impl.config_->inferEmotionEnabled();
+  bool infer_gender_enabled = impl.config_->inferGenderEnabled();
   unsigned int head_margin_milliseconds = impl.config_->headMarginMilliseconds();
   unsigned int tail_margin_milliseconds = impl.config_->tailMarginMilliseconds();
   unsigned int wait_end_milliseconds = impl.config_->waitEndMilliseconds();
@@ -74,6 +77,18 @@ void ASRSendMessage::setParameters(SpeechRecognizer::Impl &impl) {
     if (recog_timeout_seconds)
       request.set_header("recognitionTimeout.value",
                          std::to_string(recog_timeout_seconds));
+  }
+
+  if (infer_age_enabled) {
+    request.set_header("Infer-age-enabled", "true");
+  }
+
+  if (infer_emotion_enabled) {
+    request.set_header("Infer-emotion-enabled", "true");
+  }
+
+  if (infer_gender_enabled) {
+    request.set_header("Infer-gender-enabled", "true");
   }
 
   if (head_margin_milliseconds)
