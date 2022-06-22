@@ -53,37 +53,4 @@ void ASRMessageResponse::consume(const std::string& payload) {
     msg_body = payload.substr(start, end - start);
     msg_extra = payload.substr(end + hdr_delimiter.length());
   }
-
-  start = 0U;
-  end = msg_body.find(msg_delimiter);
-
-  // search for initial line
-  if (end != std::string::npos) {
-    std::string start_line = msg_body.substr(start, end - start);
-    internal::removeExtraSpaces(start_line);
-    start_line_ = start_line;
-  }
-
-  // search for headers
-  start = end + msg_delimiter.length();
-  end = msg_body.find(msg_delimiter, start);
-
-  while (end != std::string::npos) {
-    std::string line = msg_body.substr(start, end - start);
-
-    auto pos = line.find(hdr_separator);
-    if (pos == std::string::npos) continue;
-
-    std::string key = line.substr(0, pos);
-    std::string value = line.substr(pos + hdr_separator.length());
-    internal::removeExtraSpaces(key);
-    internal::removeExtraSpaces(value);
-    headers_[key] = value;
-
-    start = end + msg_delimiter.length();
-    end = msg_body.find(msg_delimiter, start);
-  }
-
-  // extra
-  extra_ = msg_extra;
 }
