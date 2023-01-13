@@ -43,7 +43,7 @@ find_package(ALSA REQUIRED)
 
 # websocketpp
 include(WebsocketppDownloader)
-set(WEBSOCKETPP_VERSION 0.7.0)
+set(WEBSOCKETPP_VERSION 0.8.2)
 websocketpp_download_and_extract("${WEBSOCKETPP_VERSION}" WEBSOCKETPP_SOURCE_PATH)
 set(WEBSOCKETPP_INCLUDE ${WEBSOCKETPP_SOURCE_PATH})
 include_directories(${WEBSOCKETPP_INCLUDE})
@@ -56,11 +56,16 @@ include(cmake/portaudio.cmake)
 # library
 #install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/ DESTINATION "include")
 include_directories(${CMAKE_SOURCE_DIR})
+include_directories(${CMAKE_SOURCE_DIR}/include/aux)
 add_subdirectory(src)
 
 # examples
 if(BUILD_EXAMPLES)
   add_subdirectory(examples)
+endif()
+
+if (BUILD_WS_MOCK)
+  add_subdirectory(ws_mock)
 endif()
 
 # unit tests

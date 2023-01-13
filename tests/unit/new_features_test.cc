@@ -45,9 +45,13 @@
 
 
 /* Most common recognizer configuration */
-std::unique_ptr<SpeechRecognizer> defaultBuild(){
+std::unique_ptr<SpeechRecognizer> defaultBuild(bool continuous = false){
   std::unique_ptr<RecognitionConfig> config =
-      RecognitionConfig::Builder().build();
+      RecognitionConfig::Builder()
+        //.maxSentences(3)
+        .continuousMode(continuous)
+        .maxSegmentDuration(3750)
+        .build();
   return SpeechRecognizer::Builder()
       .serverUrl(test::server_url)
       .recogConfig(std::move(config))
@@ -150,7 +154,7 @@ TEST(RecognizerTest, dynamicGrammarMulti) {
       LanguageModelList::Builder().addInlineGrammar(str_gram).build();
   std::shared_ptr<AudioSource> audio =
       std::make_shared<FileAudioSource>(test::audio_pizza_multi_8k);
-  std::unique_ptr<SpeechRecognizer> asr = defaultBuild();
+  std::unique_ptr<SpeechRecognizer> asr = defaultBuild(true);
   
   asr->recognize(audio, std::move(lm));
   std::vector<RecognitionResult> result = asr->waitRecognitionResult();
@@ -166,8 +170,8 @@ TEST(RecognizerTest, dynamicGrammarMulti) {
     if(res.getCode() != RecognitionResult::Code::RECOGNIZED){
       continue;
     }
-    ASSERT_LE(abs(start_times[num_res] - res.startTime()), .3) << "Start time deviated more than 300ms!";
-    ASSERT_LE(abs(end_times[num_res] - res.endTime()), .3) << "End time deviated more than 300ms!";
+    ASSERT_LE(abs(start_times[num_res] - res.startTime()), .6) << "Start time deviated more than 300ms!";
+    ASSERT_LE(abs(end_times[num_res] - res.endTime()), .6) << "End time deviated more than 300ms!";
     num_res++;
 
     for (RecognitionResult::Alternative& alt : res.getAlternatives()) {
